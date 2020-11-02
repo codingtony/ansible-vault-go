@@ -25,31 +25,37 @@ jobs:
       run: |
         go mod download
 
-    - name: Build
+    - name: Test
+      run: go test -v .
+
+    - name: Package
       run: |
         mkdir dist
         BUILD_TIME=$(date -Is)
         PACKAGE_NS="github.com/codingtony/ansible-vault-go"
         VERSION="1.0.${{ github.run_number }}"
-        LDFLAGS="-extldflags=-static  -s -w -X  "${PACKAGE_NS}"/cmd.version="${VERSION}" -X "${PACKAGE_NS}"/cmd.buildTime=${BUILD_TIME}"
+
         CGO_ENABLED=0
+        LDFLAGS="-extldflags=-static  -s -w -X  "${PACKAGE_NS}"/cmd.version="${VERSION}" -X "${PACKAGE_NS}"/cmd.buildTime=${BUILD_TIME}"
+        
         GOARCH=amd64  
+        
         GOOS=darwin
         go build -ldflags="${LDFLAGS}" -o "dist/ansible-vault-go_${GOOS}_${GOARCH}"
+        
         GOOS=windows 
         go build -ldflags="${LDFLAGS}" -o "dist/ansible-vault-go_${GOOS}_${GOARCH}.exe"
+        
         GOOS=linux
         go build -ldflags="${LDFLAGS}" -o "dist/ansible-vault-go_${GOOS}_${GOARCH}"
-        tar -cvf ansible-vault-go.tar dist
+        
+        tar -C dist -cvf ansible-vault-go.tar .
 
 
-    - name: Archive production artifacts
+    - name: Create Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: dist-1.0.${{ github.run_number }}
+        name: ansible-vault-go-1.0.${{ github.run_number }}
         path: |
           ansible-vault-go.tar
           
-
-    - name: Test
-      run: go test -v .
