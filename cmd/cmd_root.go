@@ -54,8 +54,8 @@ var (
 
 				topLevelCmd = topLevelCmd.Parent()
 			}
-			//TODO
-			//out.Debugf("%s - %s", version, buildTime)
+
+			out.Debugf("%s (Built on: %s)", version, buildTime)
 
 			if RootPFlags.passwordFlagValue != "" && RootPFlags.vaultPasswordFile != "" {
 				return fmt.Errorf("vault-password-file and password parameters are mutually exclusive")
