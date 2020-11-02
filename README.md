@@ -15,11 +15,13 @@ GO111MODULE=on go install github.com/codingtony/ansible-vault-go
 
 ### Flags for all commands
 
-`--password`, `-p`  : provide password on the command line
-`--ansible-vault-file` : provide a password file
-If password flags are not provided, the user will be prompted for a vault password.
-`--verbose` : debug output. Beware as it can contain sensible information
+| Parameter | Description |
+| ---- | ---- |
+| `--password`, `-p` | Provide a password on the command line |
+| `--ansible-vault-file` | Provide a password file |
+| `--verbose`  | Debug output. Beware as it can contain sensible information |
 
+If password flags are not provided, the user will be prompted for a vault password.
 
 ### Example : encrypt a file
 
