@@ -68,7 +68,8 @@ var (
 				if err != nil {
 					return err
 				}
-				RootPFlags.Password = strings.TrimRight(string(bytePassword), "\n")
+				// Fix line endings to match ansible-vault behavior
+				RootPFlags.Password = strings.TrimRight(strings.TrimRight(string(bytePassword), "\r\n"), "\n")
 			}
 			if RootPFlags.Password == "" {
 				out.Debugf("Password not set by flags. Prompting")

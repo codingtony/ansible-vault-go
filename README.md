@@ -39,6 +39,7 @@ ansible-vault-go encrypt -p"vault_password" /tmp/file_to_encrypt
 ```
 
 ### Example : decrypt a file
+
 Decrypt a file. Prompting for vault password.
 ```
 ansible-vault-go decrypt /tmp/file_to_encrypt
@@ -51,10 +52,9 @@ Decrypt a file. Providing vault password as parameter.
 ```
 ansible-vault-go decrypt -p"vault_password" /tmp/file_to_encrypt
 ```
-### Example generate random content and encrypt it
+### Example : generate random content and encrypt it
+
 This command is to generate a random alphanumeric string of length specified by the `--length` (or `-l` for short)  parameter. Default length is 32
-
-
 
 ```
 ansible-vault-go random_text_encrypt -p"test" -l 40
