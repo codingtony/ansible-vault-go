@@ -19,8 +19,8 @@ var (
 	ErrInvalidPadding = errors.New("invalid padding")
 )
 
-// Encrypt encrypts the input string with the vault password
-func Encrypt(input string, password string) (string, error) {
+// EncryptByteArray encrypts the input []byte with the vault password
+func EncryptByteArray(input []byte, password string) (string, error) {
 	if password == "" {
 		return "", ErrEmptyPassword
 	}
@@ -32,7 +32,7 @@ func Encrypt(input string, password string) (string, error) {
 	key := generateKey([]byte(password), salt)
 
 	// Encrypt the secret content
-	data, err := encrypt([]byte(input), salt, key)
+	data, err := encrypt(input, salt, key)
 	if err != nil {
 		return "", err
 	}
@@ -44,6 +44,11 @@ func Encrypt(input string, password string) (string, error) {
 
 	// Encode the secret payload
 	return encodeSecret(&secret{data: data, salt: salt, hmac: hashSum}, key)
+}
+
+// Encrypt encrypts the input string with the vault password
+func Encrypt(input string, password string) (string, error) {
+	return EncryptByteArray([]byte(input), password)
 }
 
 // EncryptFile encrypts the input string and saves it into the file
