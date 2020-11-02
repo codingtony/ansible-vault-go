@@ -12,13 +12,13 @@ import (
 )
 
 type fileEncryptFlagsStruct struct {
-	File     string
-	Password string
+	file     string
+	password string
 }
 
 type randomTextEncryptFlagsStruct struct {
-	Password string
-	Length   int
+	password string
+	length   int
 }
 
 var (
@@ -27,28 +27,23 @@ var (
 	fileEncryptFlags       = &fileEncryptFlagsStruct{}
 	randomTextEncryptFlags = &randomTextEncryptFlagsStruct{}
 
-	encryptCmd = &cobra.Command{
-		Use:   "encrypt",
-		Short: "Perfom ansible-vault encryption functions.",
-	}
-
 	// Command
 	fileEncryptCmd = &cobra.Command{
-		Use:                   "file [flags] [vault_password] [file]",
+		Use:                   "encrypt [flags] [file]",
 		Short:                 "Encrypt a file.",
 		DisableFlagsInUseLine: true,
-		Args:                  cobra.ExactArgs(2),
+		Args:                  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Errors at this point are no longer related to flags
 			rootCmd.SilenceUsage = true
-			fileEncryptFlags.Password = args[0]
-			fileEncryptFlags.File = args[1]
+			fileEncryptFlags.password = RootPFlags.Password
+			fileEncryptFlags.file = args[0]
 
 			return doEncryptFile(fileEncryptFlags)
 		},
 	}
 	randomTextEncryptCmd = &cobra.Command{
-		Use:   "randomText [flags] [vault_password]",
+		Use:   "random_text_encrypt [flags] [vault_password]",
 		Short: "Generate random text and encrypt it.",
 		Long: ` Generate random text and encrypt it.
 Random text is alphanumerical and of lenght controlled 
@@ -56,11 +51,10 @@ by the lenght parameter
 		`,
 
 		DisableFlagsInUseLine: true,
-		Args:                  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Errors at this point are no longer related to flags
 			rootCmd.SilenceUsage = true
-			randomTextEncryptFlags.Password = args[0]
+			randomTextEncryptFlags.password = RootPFlags.Password
 
 			return doRandomTextEncrypt(randomTextEncryptFlags)
 		},
@@ -69,24 +63,23 @@ by the lenght parameter
 
 // //goland:noinspection GoUnhandledErrorResult
 func init() {
-	rootCmd.AddCommand(encryptCmd)
-	encryptCmd.AddCommand(fileEncryptCmd)
-	encryptCmd.AddCommand(randomTextEncryptCmd)
+	rootCmd.AddCommand(fileEncryptCmd)
+	rootCmd.AddCommand(randomTextEncryptCmd)
 	randomTextEncryptCmd.Flags().
-		IntVarP(&randomTextEncryptFlags.Length, "length", "l", 32, "length of generated random context.")
+		IntVarP(&randomTextEncryptFlags.length, "length", "l", 32, "length of generated random content")
 }
 
 func doEncryptFile(flags *fileEncryptFlagsStruct) error {
-	data, err := ioutil.ReadFile(flags.File)
+	data, err := ioutil.ReadFile(flags.file)
 	if err != nil {
 		return err
 	}
-	f, err := os.Create(flags.File)
+	f, err := os.Create(flags.file)
 	defer f.Close()
 	if err != nil {
 		return err
 	}
-	cipher, err := vault.EncryptByteArray(data, flags.Password)
+	cipher, err := vault.EncryptByteArray(data, flags.password)
 	if err != nil {
 		return err
 	}
@@ -99,9 +92,9 @@ func doEncryptFile(flags *fileEncryptFlagsStruct) error {
 }
 
 func doRandomTextEncrypt(flags *randomTextEncryptFlagsStruct) error {
-	data := randomString(flags.Length)
+	data := randomString(flags.length)
 	out.Debugf("Generated string : %s", data)
-	cipher, err := vault.Encrypt(data, flags.Password)
+	cipher, err := vault.Encrypt(data, flags.password)
 	if err != nil {
 		return err
 	}
