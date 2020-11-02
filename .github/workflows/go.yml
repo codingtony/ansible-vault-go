@@ -24,16 +24,13 @@ jobs:
     - name: Get dependencies
       run: |
         go mod download
-        # if [ -f Gopkg.toml ]; then
-        #    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        #    dep ensure
-        # fi
 
     - name: Build
       run: |
         mkdir dist
         BUILD_TIME=$(date -Is)
-        LDFLAGS="-extldflags=-static  -s -w -X cmd.version=1.0.${{ github.run_number }} -X cmd.buildTime=${BUILD_TIME}"
+        PACKAGE_NS="github.com/codingtony/ansible-vault-go"
+        LDFLAGS="-extldflags=-static  -s -w -X  "${PACKAGE_NS}"/cmd.version=1.0.${{ github.run_number }} -X "${PACKAGE_NS}"/cmd.buildTime=${BUILD_TIME}"
         CGO_ENABLED=0
         GOARCH=amd64  
         GOOS=darwin
