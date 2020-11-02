@@ -31,11 +31,20 @@ jobs:
 
     - name: Build
       run: |
+        mkdir dist
         BUILD_TIME=$(date -Is)
         LDFLAGS="-extldflags=-static  -s -w -X cmd.version=1.0.${{ github.run_number }} -X cmd.buildTime=${BUILD_TIME}"
-        CGO_ENABLED=0 GOOS=darwin GOARCH=amd64  go build -ldflags="${LDFLAGS}" -o "ansible-vault-go_${GOOS}_${GOARCH}"
-        CGO_ENABLED=0 GOOS=windows GOARCH=amd64  go build -ldflags="${LDFLAGS}" -o "ansible-vault-go_${GOOS}_${GOARCH}.exe"
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64  go build -ldflags="${LDFLAGS}" -o "ansible-vault-go_${GOOS}_${GOARCH}"
+        CGO_ENABLED=0 GOOS=darwin GOARCH=amd64  go build -ldflags="${LDFLAGS}" -o "dist/ansible-vault-go_${GOOS}_${GOARCH}"
+        CGO_ENABLED=0 GOOS=windows GOARCH=amd64  go build -ldflags="${LDFLAGS}" -o "dist/ansible-vault-go_${GOOS}_${GOARCH}.exe"
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64  go build -ldflags="${LDFLAGS}" -o "dist/ansible-vault-go_${GOOS}_${GOARCH}"
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: |
+          dist
+          
 
     - name: Test
       run: go test -v .
